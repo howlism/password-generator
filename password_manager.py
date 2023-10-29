@@ -6,7 +6,6 @@ from cryptography.fernet import Fernet
 
 # TODO: make user accounts read different files (classes)
 # TODO: add GUI (@ some point :>)
-# TODO: fix all spelling mistakes
 
 accountName = ""
 
@@ -129,7 +128,7 @@ def read():
 
 def mode():
     while True:
-        mode = input("Do you want to read or write account credentials? ").lower()
+        mode = input("Do you want to read or write account credentials or generate a password or quit? ").lower()
         if mode == 'read':
             read()
         elif mode == 'write':
@@ -147,7 +146,7 @@ def mode():
                     break
             newGeneratedPassword = generator(pwordLength)
             print("Your new password is " + newGeneratedPassword + ".")
-            copyornocopy = input("would you like to copy this to your clipboard? ").lower()
+            copyornocopy = input("Would you like to copy this to your clipboard? ").lower()
             if copyornocopy == 'yes' or copyornocopy == 'y':
                 pyperclip.copy(newGeneratedPassword)
                 print("Successfully copied to clipboard!")
