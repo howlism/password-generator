@@ -12,9 +12,9 @@ accountName = ""
 
 def createFiles():
     with open('accounts.txt', 'a') as file:
-        file.close()
+        file.writelines("\n")
     with open('passwords.txt', 'a') as file:
-        file.close()
+        file.writelines("\n")
 
 
 def newkey():
@@ -29,28 +29,24 @@ def loadkey():
 
 
 def createNewAccount():
-    newUserName = input("What is your name? ")
+    newUserName = input("What is your name? ").strip()
     found = False
     with open("accounts.txt", 'r') as file:
         lines = file.readlines()
-        if lines:
-            for line in lines:
-                strip = line.strip()
-                split = strip.split('|')
-                if split[0] == newUserName:
-                    print("Sorry this account already exists, try logging in.")
-                else:
-                    newPassword = input("What do you want your password to be? ")
-                    with open("accounts.txt", 'a') as file:
-                        file.writelines(newUserName + "|" + fernet.encrypt(newPassword.encode()).decode() + "\n")
-        else:
-            newPassword = input("What do you want your password to be? ")
-            with open("accounts.txt", 'a') as file:
-                file.writelines(newUserName + "|" + fernet.encrypt(newPassword.encode()).decode() + "\n")
+        for line in lines:
+            strip = line.strip()
+            split = strip.split('|')
+            if split[0] == newUserName:
+                print("Sorry this account already exists, try logging in.")
+                loginToAccount()
+        newPassword = input("What do you want your password to be? ").strip()
+        with open("accounts.txt", 'a') as file:
+            file.writelines(newUserName + "|" + fernet.encrypt(newPassword.encode()).decode() + "\n")
+        mode()
 
 
 def loginToAccount():
-    accountName = input("Enter your name: ")
+    accountName = input("Enter your name: ").strip()
     found = False
     with open("accounts.txt", 'r') as file:
         lines = file.readlines()
@@ -60,7 +56,7 @@ def loginToAccount():
             if accountName == split[0]:
                 counter = 0
                 while counter < 3:
-                    password = input("Please enter your password: ")
+                    password = input("Please enter your password: ").strip()
                     decPassword = fernet.decrypt(split[1].encode()).decode()
                     if password == decPassword:
                         mode()
@@ -82,9 +78,9 @@ def generator(length):
 
 
 def write():
-    website = input("Please input the website associated with these credentials: ")
-    username = input("Please input the username associated with these credentials: ")
-    password = input("Please input the password associated with these credentials: ")
+    website = input("Please input the website associated with these credentials: ").strip()
+    username = input("Please input the username associated with these credentials: ").strip()
+    password = input("Please input the password associated with these credentials: ").strip()
     websiteE = fernet.encrypt(website.encode()).decode()
     usernameE = fernet.encrypt(username.encode()).decode()
     passwordE = fernet.encrypt(password.encode()).decode()
@@ -94,8 +90,8 @@ def write():
 
 
 def writeGeneratedPassword(password):
-    website = input("Please input the website associated with this password: ")
-    username = input("Please input the username associated with this password: ")
+    website = input("Please input the website associated with this password: ").strip()
+    username = input("Please input the username associated with this password: ").strip()
     websiteE = fernet.encrypt(website.encode()).decode()
     usernameE = fernet.encrypt(username.encode()).decode()
     passwordE = fernet.encrypt(password.encode()).decode()
@@ -107,7 +103,7 @@ def writeGeneratedPassword(password):
 def read():
     websiteInput = input(
         "Please enter the website associated with this account: "
-    ).casefold()
+    ).casefold().strip()
     with open("passwords.txt", "r") as file:
         lines = file.readlines()
         found = False
@@ -133,7 +129,8 @@ def read():
 
 def mode():
     while True:
-        mode = input("Do you want to (read) or (write) account credentials or (generate) a password or (quit)? ").lower()
+        mode = input(
+            "Do you want to (read) or (write) account credentials or (generate) a password or (quit)? ").lower().strip()
         if mode == 'read':
             read()
         elif mode == 'write':
@@ -143,7 +140,7 @@ def mode():
             quit()
         elif mode == 'generate' or mode == 'generator':
             while True:
-                pwordLength = int(input("What would you like the length of your password to be? (8-16) "))
+                pwordLength = int(input("What would you like the length of your password to be? (8-16) ").strip())
                 if pwordLength < 8 or pwordLength > 16:
                     print("Invalid choice. Please try again.")
                     continue
@@ -151,11 +148,11 @@ def mode():
                     break
             newGeneratedPassword = generator(pwordLength)
             print("Your new password is " + newGeneratedPassword + ".")
-            copyornocopy = input("Would you like to copy this to your clipboard? (Y/N) ").lower()
+            copyornocopy = input("Would you like to copy this to your clipboard? (Y/N) ").lower().strip()
             if copyornocopy == 'yes' or copyornocopy == 'y':
                 pyperclip.copy(newGeneratedPassword)
                 print("Successfully copied to clipboard!")
-                y = input("Would you also like to add this password to the manager? (Y/N) ").lower()
+                y = input("Would you also like to add this password to the manager? (Y/N) ").lower().strip()
                 if y == 'yes' or y == 'y':
                     writeGeneratedPassword(newGeneratedPassword)
                 elif y == 'no' or y == 'n':
@@ -164,7 +161,7 @@ def mode():
                     print("Invalid choice")
                     quit()
             elif copyornocopy == 'no' or copyornocopy == 'n':
-                x = input("Would you like to add this password to the password manager? (Y/N) ").lower()
+                x = input("Would you like to add this password to the password manager? (Y/N) ").lower().strip()
                 if x == 'yes' or x == 'y':
                     writeGeneratedPassword(newGeneratedPassword)
                 elif x == 'no' or x == 'n':
@@ -188,7 +185,7 @@ while True:
         fernet = Fernet(key)
 
         if os.path.exists("accounts.txt"):
-            accountMode = input("Do you want to (log in), or (create) a new account? ").lower()
+            accountMode = input("Do you want to (log in), or (create) a new account? ").lower().strip()
             if accountMode == 'create':
                 createNewAccount()
             elif accountMode == 'login' or accountMode == 'log in':
