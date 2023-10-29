@@ -14,6 +14,29 @@ def createAccountList():
         file.writelines("\n")
 
 
+def listWebsites(name):
+    with open("passwords_" + name + ".txt", "r") as file:
+        lines = file.readlines()
+        found = False
+        for line in lines:
+            strip = line.strip()
+            split = strip.split("|")
+            if len(split) != 3:
+                continue
+            website = split[0]
+            decWebsite = fernet.decrypt(website.encode()).decode()
+            print(decWebsite)
+
+
+def clearFiles():
+    dirList = os.listdir()
+    for i in dirList:
+        if i.endswith(".txt"):
+            os.remove(i)
+            print(i + " deleted")
+            quit()
+
+
 def newkey():
     with open("secret.key", 'ab') as file:
         file.write(key)
@@ -56,6 +79,7 @@ def loginToAccount():
                     password = input("Please enter your password: ").strip()
                     decPassword = fernet.decrypt(split[1].encode()).decode()
                     if password == decPassword:
+                        file.close()
                         fileName = accountName
                         mode(fileName)
                     else:
@@ -65,6 +89,7 @@ def loginToAccount():
                             continue
                         elif counter == 3:
                             print("Login failed. Please try again.")
+
 
 def generator(length):
     generatedPassword = ""
@@ -86,7 +111,7 @@ def write(name):
         file.writelines(credentials)
 
 
-def writeGeneratedPassword(password,name):
+def writeGeneratedPassword(password, name):
     website = input("Please input the website associated with this password: ").strip()
     username = input("Please input the username associated with this password: ").strip()
     websiteE = fernet.encrypt(website.encode()).decode()
@@ -135,6 +160,12 @@ def mode(name):
         elif mode == 'quit' or mode == 'exit' or mode == 'stop':
             print("Exiting...")
             quit()
+        elif mode == 'clear files':
+            clearFiles()
+            continue
+        elif mode == 'list websites':
+            listWebsites(name)
+            continue
         elif mode == 'generate' or mode == 'generator':
             while True:
                 pwordLength = int(input("What would you like the length of your password to be? (8-16) ").strip())
@@ -151,7 +182,7 @@ def mode(name):
                 print("Successfully copied to clipboard!")
                 y = input("Would you also like to add this password to the manager? (Y/N) ").lower().strip()
                 if y == 'yes' or y == 'y':
-                    writeGeneratedPassword(newGeneratedPassword,name)
+                    writeGeneratedPassword(newGeneratedPassword, name)
                 elif y == 'no' or y == 'n':
                     continue
                 else:
@@ -160,7 +191,7 @@ def mode(name):
             elif copyornocopy == 'no' or copyornocopy == 'n':
                 x = input("Would you like to add this password to the password manager? (Y/N) ").lower().strip()
                 if x == 'yes' or x == 'y':
-                    writeGeneratedPassword(newGeneratedPassword,name)
+                    writeGeneratedPassword(newGeneratedPassword, name)
                 elif x == 'no' or x == 'n':
                     continue
                 else:
