@@ -58,14 +58,19 @@ def loginToAccount():
             strip = line.strip()
             split = strip.split('|')
             if accountName == split[0]:
-                print("Username found")
-                password = input("Please enter your password: ")
-                decPassword = fernet.decrypt(split[1].encode()).decode()
-                if password == decPassword:
-                    mode()
-                else:
-                    print("Incorrect password.")
-                    quit()
+                counter = 0
+                while counter < 3:
+                    password = input("Please enter your password: ")
+                    decPassword = fernet.decrypt(split[1].encode()).decode()
+                    if password == decPassword:
+                        mode()
+                    else:
+                        if counter < 3:
+                            print("Incorrect password. You have " + str(2 - counter) + " attempts remaining.")
+                            counter += 1
+                            continue
+                        elif counter == 3:
+                            print("Login failed. Please try again.")
 
 
 def generator(length):
@@ -128,7 +133,7 @@ def read():
 
 def mode():
     while True:
-        mode = input("Do you want to read or write account credentials or generate a password or quit? ").lower()
+        mode = input("Do you want to (read) or (write) account credentials or (generate) a password or (quit)? ").lower()
         if mode == 'read':
             read()
         elif mode == 'write':
@@ -137,8 +142,8 @@ def mode():
             print("Exiting...")
             quit()
         elif mode == 'generate' or mode == 'generator':
-            pwordLength = int(input("What would you like the length of your password to be? (8-16) "))
             while True:
+                pwordLength = int(input("What would you like the length of your password to be? (8-16) "))
                 if pwordLength < 8 or pwordLength > 16:
                     print("Invalid choice. Please try again.")
                     continue
@@ -146,11 +151,11 @@ def mode():
                     break
             newGeneratedPassword = generator(pwordLength)
             print("Your new password is " + newGeneratedPassword + ".")
-            copyornocopy = input("Would you like to copy this to your clipboard? ").lower()
+            copyornocopy = input("Would you like to copy this to your clipboard? (Y/N) ").lower()
             if copyornocopy == 'yes' or copyornocopy == 'y':
                 pyperclip.copy(newGeneratedPassword)
                 print("Successfully copied to clipboard!")
-                y = input("Would you also like to add this password to the manager? ").lower()
+                y = input("Would you also like to add this password to the manager? (Y/N) ").lower()
                 if y == 'yes' or y == 'y':
                     writeGeneratedPassword(newGeneratedPassword)
                 elif y == 'no' or y == 'n':
@@ -159,7 +164,7 @@ def mode():
                     print("Invalid choice")
                     quit()
             elif copyornocopy == 'no' or copyornocopy == 'n':
-                x = input("Would you like to add this password to the password manager? ").lower()
+                x = input("Would you like to add this password to the password manager? (Y/N) ").lower()
                 if x == 'yes' or x == 'y':
                     writeGeneratedPassword(newGeneratedPassword)
                 elif x == 'no' or x == 'n':
@@ -183,7 +188,7 @@ while True:
         fernet = Fernet(key)
 
         if os.path.exists("accounts.txt"):
-            accountMode = input("Do you want to log in, or create a new account? ").lower()
+            accountMode = input("Do you want to (log in), or (create) a new account? ").lower()
             if accountMode == 'create':
                 createNewAccount()
             elif accountMode == 'login' or accountMode == 'log in':
