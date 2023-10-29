@@ -6,8 +6,16 @@ from cryptography.fernet import Fernet
 
 # TODO: make user accounts read different files (classes)
 # TODO: add GUI (@ some point :>)
+# TODO: fix all spelling mistakes
 
 accountName = ""
+
+
+def createFiles():
+    with open('accounts.txt', 'a') as file:
+        file.close()
+    with open('passwords.txt', 'a') as file:
+        file.close()
 
 
 def newkey():
@@ -165,21 +173,23 @@ def mode():
             continue
 
 
-if not os.path.exists("secret.key"):
-    print("Key not found, generating one for you.")
-    key = Fernet.generate_key()
-    fernet = Fernet(key)
-    newkey()
-else:
-    key = loadkey()
-    fernet = Fernet(key)
-
-    if os.path.exists("accounts.txt"):
-        accountMode = input("Do you want to log in, or create a new account? ").lower()
-        if accountMode == 'create':
-            createNewAccount()
-        elif accountMode == 'login' or accountMode == 'log in':
-            loginToAccount()
+while True:
+    if not os.path.exists("secret.key"):
+        print("Key not found, generating one for you.")
+        key = Fernet.generate_key()
+        fernet = Fernet(key)
+        newkey()
     else:
-        print("You do not have any user accounts created.")
-        createNewAccount()
+        key = loadkey()
+        fernet = Fernet(key)
+
+        if os.path.exists("accounts.txt"):
+            accountMode = input("Do you want to log in, or create a new account? ").lower()
+            if accountMode == 'create':
+                createNewAccount()
+            elif accountMode == 'login' or accountMode == 'log in':
+                loginToAccount()
+        else:
+            print("You do not have any user accounts created.")
+            createFiles()
+            createNewAccount()
